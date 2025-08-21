@@ -7,238 +7,137 @@
   <meta name="description" content="NextPointo: lightweight, mobile-first sports analytics. Starting with squash, powered by computer vision." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="nextpointologo.png"/>
-  <meta property="og:title" content="NextPointo — Sports & Vision Analytics" />
-  <meta property="og:description" content="Mobile-first sports analytics. Starting with squash — every rally, every shot, every next point." />
-  <meta property="og:image" content="nextpointologo.png" />
   <meta name="theme-color" content="#0b1020" />
   <style>
-    :root {
-      --bg: #070b18;
-      --panel: rgba(255,255,255,0.06);
-      --panel-strong: rgba(255,255,255,0.12);
-      --text: #ecf2ff;
-      --muted: #b8c3dd;
-      --brand-1: #00d4ff;
-      --brand-2: #6a5cff;
-      --brand-3: #ff8b3d;
-      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    :root{
+      --bg-1:#06080f; --bg-2:#0b1020; --bg-3:#13193a;
+      --text:#eef3ff; --muted:#b9c2d9;
+      --brand-1:#00d4ff; --brand-2:#6a5cff; --brand-3:#ff8b3d;
+      --panel:rgba(255,255,255,.06); --panel-strong:rgba(255,255,255,.14);
+      --shadow:0 10px 30px rgba(0,0,0,.45);
     }
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg: #f6f8ff;
-        --panel: rgba(11,16,32,0.06);
-        --panel-strong: rgba(11,16,32,0.16);
-        --text: #0b1020;
-        --muted: #4b5471;
-        --shadow: 0 10px 20px rgba(20,30,60,0.12);
-      }
+    @media (prefers-color-scheme: light){
+      :root{--bg-1:#f7f9ff; --bg-2:#eef3ff; --bg-3:#e8eeff; --text:#0b1020; --muted:#4b5471; --panel:rgba(11,16,32,.06); --panel-strong:rgba(11,16,32,.16); --shadow:0 8px 18px rgba(20,30,60,.12)}
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      overflow-x: hidden;
-    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text);background: radial-gradient(1200px 800px at 15% -10%, rgba(0,212,255,.16), transparent 60%), radial-gradient(1000px 700px at 95% -10%, rgba(106,92,255,.18), transparent 60%), linear-gradient(180deg, var(--bg-1), var(--bg-2) 40%, var(--bg-3));}
+    a{color:inherit;text-decoration:none}
 
-    /* --- Background layers (orbs, grid, noise) --- */
-    .bg-wrap { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
-    .orb { position: absolute; filter: blur(60px); opacity: .55; mix-blend-mode: screen; }
-    .orb.o1 { width: 600px; height: 600px; background: radial-gradient(circle at 30% 30%, rgba(0,212,255,.9), transparent 60%); top: -120px; left: -120px; }
-    .orb.o2 { width: 700px; height: 700px; background: radial-gradient(circle at 70% 20%, rgba(106,92,255,.9), transparent 60%); top: -160px; right: -140px; }
-    .orb.o3 { width: 800px; height: 800px; background: radial-gradient(circle at 60% 60%, rgba(255,139,61,.7), transparent 60%); bottom: -220px; left: 20%; }
-    .grid {
-      position: absolute; inset: 0; background:
-        linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
-      background-size: 40px 40px;
-      mask-image: radial-gradient(1200px 600px at 50% -10%, black 40%, transparent 65%);
-    }
-    .noise { position:absolute; inset:0; opacity:.04; background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="120" height="120" filter="url(%23n)" opacity=".3"/></svg>'); mix-blend-mode: overlay; }
+    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;background:linear-gradient(180deg, rgba(0,0,0,.45), transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--panel)}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:34px; width:auto; filter:drop-shadow(0 2px 8px rgba(0,212,255,.35));}
+    .tag{font-weight:700;font-size:.9rem;padding:6px 10px;border-radius:999px;border:1px solid var(--panel-strong);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));color:var(--muted)}
 
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 24px; position: sticky; top: 0; z-index: 10;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      background: linear-gradient(180deg, rgba(0,0,0,0.35), transparent);
-      border-bottom: 1px solid var(--panel);
-    }
-    header img { height: 40px; }
-    .badge { padding: 6px 10px; border-radius: 999px; background: var(--panel);
-      border: 1px solid var(--panel-strong); color: var(--muted); font-weight: 600; font-size: 12px; }
+    .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
 
-    .hero {
-      max-width: 1200px; margin: 0 auto; padding: 64px 20px 24px;
-      display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center;
-    }
-    @media (max-width: 960px) { .hero { grid-template-columns: 1fr; } }
+    .hero{padding:60px 0 10px;display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center}
+    @media (max-width:960px){.hero{grid-template-columns:1fr;padding-top:36px}}
+    h1{margin:10px 0 12px;font-size:clamp(2.4rem,6vw,4.4rem);line-height:1.02}
+    .grad{background:linear-gradient(135deg,var(--brand-1),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lead{font-size:1.15rem;color:var(--muted);line-height:1.7}
 
-    h1 { font-size: clamp(2.4rem, 5vw, 4rem); margin: 8px 0 16px; line-height: 1.05; }
-    .grad-text { background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    p.lead { font-size: 1.15rem; color: var(--muted); line-height: 1.7; }
+    .logo-pill{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--panel-strong);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border-radius:16px;padding:10px 14px;box-shadow:var(--shadow)}
+    .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+    .btn{padding:14px 22px;border-radius:12px;font-weight:800;border:1px solid transparent;cursor:pointer;font-size:1rem;transition:transform .08s ease, box-shadow .2s ease}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:linear-gradient(135deg,var(--brand-1),var(--brand-2));color:#081023;box-shadow:var(--shadow)}
+    .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--panel-strong)}
 
-    .cta { display:flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
-    .btn { padding: 14px 22px; border-radius: 12px; font-weight: 700; border: 1px solid transparent; cursor: pointer; font-size: 1rem; transition: transform .08s ease, box-shadow .2s ease; }
-    .btn:active { transform: translateY(1px); }
-    .btn.primary { background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); color: #081023; box-shadow: var(--shadow); }
-    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--panel-strong); }
+    .video-section{padding:26px 0 0}
+    .video-wrap{position:relative;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);background:#000;border:1px solid var(--panel-strong)}
+    video{display:block;width:100%;height:auto;background:#000}
+    .video-glow{position:absolute;inset:-20%;pointer-events:none;filter:blur(60px);background:radial-gradient(circle at 40% 30%, rgba(0,212,255,.18), transparent 60%), radial-gradient(circle at 70% 60%, rgba(106,92,255,.18), transparent 60%)}
 
-    .glass {
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      border: 1px solid var(--panel-strong); border-radius: 18px; box-shadow: var(--shadow);
-    }
-    .panel { padding: 18px; }
+    .section{padding:46px 0;text-align:center}
+    .section h2{font-size:clamp(1.6rem,3vw,2.2rem);margin:0 0 10px}
+    .section p{color:var(--muted);max-width:900px;margin:0 auto}
 
-    .video-wrap { position: relative; overflow: hidden; border-radius: 18px; box-shadow: var(--shadow); }
-    video { display:block; width:100%; height:auto; background: #000; }
-    .video-glow { position:absolute; inset:-20%; pointer-events:none; filter: blur(60px);
-      background: radial-gradient(circle at 50% 50%, rgba(0,212,255,.2), transparent 60%), radial-gradient(circle at 70% 40%, rgba(106,92,255,.2), transparent 60%); }
+    .signup{display:grid;grid-template-columns:1fr auto;gap:10px;max-width:520px;margin:16px auto 0}
+    @media (max-width:520px){.signup{grid-template-columns:1fr}}
+    .input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--panel-strong);background:rgba(255,255,255,.06);color:var(--text);outline:none}
 
-    .section { max-width: 1100px; margin: 56px auto; padding: 0 20px; text-align: center; }
-    .section h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 10px; }
-    .section p { color: var(--muted); }
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+    @media (max-width:960px){.cards{grid-template-columns:1fr}}
+    .card{padding:16px;border-radius:16px;border:1px solid var(--panel-strong);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));box-shadow:var(--shadow)}
+    .card h3{margin:6px 0 6px}
+    .subtle{color:var(--muted)}
 
-    .features { display:grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 24px; }
-    @media (max-width: 960px) { .features { grid-template-columns: 1fr; } }
-
-    .card { padding: 16px; transform-style: preserve-3d; will-change: transform; }
-    .card h3 { margin: 6px 0 8px; }
-    .subtle { color: var(--muted); font-size: .95rem; line-height: 1.6; }
-
-    footer { text-align: center; padding: 36px 20px; font-size: 0.9rem; color: var(--muted); }
-
-    /* Reduce motion */
-    @media (prefers-reduced-motion: reduce) {
-      .card, .btn { transition: none; }
-      .video-glow, .orb { display:none; }
-    }
+    footer{text-align:center;padding:40px 20px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <!-- Decorative background -->
-  <div class="bg-wrap" aria-hidden="true">
-    <div class="orb o1"></div>
-    <div class="orb o2"></div>
-    <div class="orb o3"></div>
-    <div class="grid"></div>
-    <div class="noise"></div>
-  </div>
-
   <header>
-    <img src="nextpointologo.png" alt="NextPointo Logo" loading="eager">
-    <span class="badge">Private Alpha • CV-powered</span>
+    <div class="brand">
+      <img src="nextpointologo.png" alt="NextPointo logo" loading="eager" />
+      <span class="tag">Sports & Vision Analytics</span>
+    </div>
+    <span class="tag">Private Alpha • CV‑powered</span>
   </header>
 
-  <main>
-    <section class="hero">
+  <main class="wrap">
+    <!-- HERO: logo + tagline -->
+    <section class="hero" id="home">
       <div>
-        <div class="badge">Sports & Vision Analytics</div>
-        <h1><span class="grad-text">NextPointo</span></h1>
-        <p class="lead">We’re building a lightweight, mobile‑first sports analytics platform. Starting with squash — every rally, every shot, every <strong>next point</strong>. Powered by computer vision, built for athletes everywhere.</p>
+        <span class="logo-pill"><img src="nextpointologo.png" alt="Logo small" style="height:20px"><strong>NextPointo</strong></span>
+        <h1 class="grad">See your next point.</h1>
+        <p class="lead">Lightweight, mobile‑first sports analytics. Starting with squash — every rally, every shot, every <strong>next point</strong>. Powered by computer vision, built for athletes everywhere.</p>
         <div class="cta">
-          <a href="mailto:info@nextpointo.com" class="btn primary">Stay Updated</a>
-          <a href="#demo" class="btn ghost">Watch Demo</a>
-        </div>
-
-        <!-- mini KPI strip -->
-        <div class="glass panel" style="margin-top:20px; display:grid; grid-template-columns: repeat(3,1fr); gap:12px;">
-          <div>
-            <div style="font-weight:800; font-size:1.2rem;">No Sensors</div>
-            <div class="subtle">Phone-only capture</div>
-          </div>
-          <div>
-            <div style="font-weight:800; font-size:1.2rem;">Realtime-ish</div>
-            <div class="subtle">On-device or cloud</div>
-          </div>
-          <div>
-            <div style="font-weight:800; font-size:1.2rem;">Cross‑Sport</div>
-            <div class="subtle">Squash → Tennis → More</div>
-          </div>
+          <a class="btn primary" href="mailto:info@nextpointo.com?subject=NextPointo%20alpha%20interest">Stay Updated</a>
+          <a class="btn ghost" href="#demo">Watch Demo</a>
         </div>
       </div>
-
-      <div class="video-wrap glass" id="demo">
-        <video 
-          src="sample_detection_1.mp4"
-          poster="nextpointologo.png"
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="metadata"
-          aria-label="Sample detection demo video">
-        </video>
+      <div class="video-wrap">
+        <video id="heroVideo" src="sample_detection_1.mp4" poster="nextpointologo.png" autoplay muted loop playsinline preload="metadata" aria-label="Sample detection demo"></video>
         <div class="video-glow"></div>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Our Vision</h2>
-      <p>NextPointo aims to make world-class sports analytics accessible to everyone. Using just your phone, our AI tracks rallies, movement, and key moments — no sensors, no friction. From squash to tennis, courts to fields, and beyond into computer vision analytics.</p>
-
-      <div class="features">
-        <div class="glass card" data-tilt>
-          <img src="nextpointologo.png" alt="Tracking" style="height:44px; opacity:.9;"/>
-          <h3>Ball & Rally Tracking</h3>
-          <p class="subtle">Frame-accurate ball paths, rally segmentation, speed & impact zones.</p>
-        </div>
-        <div class="glass card" data-tilt>
-          <img src="nextpointologo.png" alt="Insights" style="height:44px; opacity:.9;"/>
-          <h3>Actionable Insights</h3>
-          <p class="subtle">Heatmaps, shot charts, and trends to improve your <em>next</em> point.</p>
-        </div>
-        <div class="glass card" data-tilt>
-          <img src="nextpointologo.png" alt="Share" style="height:44px; opacity:.9;"/>
-          <h3>Effortless Sharing</h3>
-          <p class="subtle">Clip, caption, and share highlights directly with coaches and friends.</p>
-        </div>
+    <!-- DEMO focus (separate anchor) -->
+    <section class="video-section" id="demo">
+      <div class="video-wrap">
+        <video src="sample_detection_1.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Sample detection demo duplicate for focus"></video>
+        <div class="video-glow"></div>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Inspiration</h2>
-      <p>Squash taught us resilience: it’s not the last rally that matters, but the next one. That’s the heart of NextPointo — always focusing on the next rally, next checkpoint, next data point. Whatever your sport, we’ll help you see it clearer.</p>
-      <div style="margin-top:24px" class="cta">
-        <a href="mailto:info@nextpointo.com" class="btn primary">Join the Alpha List</a>
-        <a href="#" class="btn ghost" id="downloadBtn">Download Demo Clip</a>
+    <!-- MISSION -->
+    <section class="section" id="mission">
+      <h2>Our Mission</h2>
+      <p>Make world‑class sports analytics accessible to everyone. Using just your phone, our AI tracks rallies, movement, and key moments — no sensors, no friction. From squash to tennis, courts to fields, and beyond into computer‑vision insights.</p>
+      <div class="cards">
+        <div class="card"><h3>Ball & Rally Tracking</h3><p class="subtle">Frame‑accurate ball paths, rally segmentation, speed & impact zones.</p></div>
+        <div class="card"><h3>Actionable Insights</h3><p class="subtle">Heatmaps, shot charts, and trends to improve your <em>next</em> point.</p></div>
+        <div class="card"><h3>Effortless Sharing</h3><p class="subtle">Clip, caption, and share highlights with coaches and friends.</p></div>
       </div>
+    </section>
+
+    <!-- SIGNUP (no broken links: opens email compose) -->
+    <section class="section" id="signup">
+      <h2>Get Early Access</h2>
+      <p>Join our mailing list for alpha invites and product updates.</p>
+      <form class="signup" id="newsletter">
+        <input class="input" id="email" name="email" type="email" placeholder="you@example.com" required aria-label="Your email" />
+        <button class="btn primary" type="submit">Sign Up</button>
+      </form>
+      <p class="subtle" style="margin-top:8px">We’ll only email when there’s something worth your next point.</p>
     </section>
   </main>
 
-  <footer>
-    © 2025 NextPointo — Sports & Vision Analytics. All rights reserved.
-  </footer>
+  <footer>© 2025 NextPointo — Sports & Vision Analytics. All rights reserved.</footer>
 
   <script>
-    // Simple parallax on hero cards (tilt effect)
-    const cards = document.querySelectorAll('[data-tilt]');
-    const clamp = (n, min, max) => Math.max(min, Math.min(n, max));
-    cards.forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const r = card.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width;
-        const y = (e.clientY - r.top) / r.height;
-        const rx = clamp((0.5 - y) * 8, -8, 8);
-        const ry = clamp((x - 0.5) * 8, -8, 8);
-        card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'rotateX(0) rotateY(0)';
-      });
-    });
-
-    // Light download helper for the sample video
-    document.getElementById('downloadBtn')?.addEventListener('click', (e) => {
+    // Newsletter: open a mailto with the provided email (no broken links / works without backend)
+    document.getElementById('newsletter')?.addEventListener('submit', function(e){
       e.preventDefault();
-      const a = document.createElement('a');
-      a.href = 'sample_detection_1.mp4';
-      a.download = 'nextpointo_demo.mp4';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const email = (document.getElementById('email')||{}).value || '';
+      const subject = encodeURIComponent('NextPointo newsletter signup');
+      const body = encodeURIComponent(`Please add me to the mailing list.\nEmail: ${email}`);
+      window.location.href = `mailto:info@nextpointo.com?subject=${subject}&body=${body}`;
     });
+    // Autoplay helper for iOS (already muted/playsinline)
+    const v = document.getElementById('heroVideo');
+    if(v){ v.play().catch(()=>{ v.muted = true; v.play(); }); }
   </script>
 </body>
 </html>
